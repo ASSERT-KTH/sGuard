@@ -28,3 +28,11 @@ solc-select use 0.4.26 --always-install
 npm run dev contracts/sample.sol
 ```
 The fixed file is `contracts/sample.fixed.sol`
+
+## 3. Docker
+
+Install Docker image and test sample.sol
+```bash
+docker build -t sguard .
+docker run --rm -v ./contracts:/sGuard/contracts assert/sguard contracts/sample.sol
+```
