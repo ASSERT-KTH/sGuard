@@ -16,8 +16,8 @@ let mainContract = ''
 
 if (process.argv.length >= 3) {
   contractFile = process.argv[2]
-  fixedFile = contractFile + '.fixed.sol'
-  jsonFile = contractFile + '.json'
+  fixedFile = contractFile.replace(/\.sol$/, '.fixed.sol')
+  jsonFile = contractFile.replace(/\.sol$/, '.json')
   if (process.argv[3])
     mainContract = process.argv[3]
 } 
