@@ -4,66 +4,27 @@ Clone the project to `project_folder/` and install dependencies
 
 ```bash
 cd project_folder/
-npm install && mkdir contracts/
+npm install
 ```
 
-Place the following contract to `contracts/sample.sol`
-```solidity
-// contracts/sample.sol
-
-pragma solidity^0.4.26;
-
-contract Fund {
-  mapping(address => uint) balances;
-  uint counter = 0;
-  uint dontFixMe = 0;
-
-  function main(uint x) public {
-    if (counter < 100) {
-      msg.sender.send(x + 1);
-      counter += 1;
-      dontFixMe ++;
-    }
-  }
-}
+Install solc-select and select the corresponding compiler version:
+```bash
+pip install solc-select
 ```
-Run `npm run dev` to patch `sample.sol`. The fixed file is `contracts/fixed.sol`
 
-```solidity
-//contracts/fixed.sol
-
-contract sGuard{
-  function add_uint256(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-
-  bool internal locked_;
-  constructor() internal {
-    locked_ = false;
-  }
-  modifier nonReentrant_() {
-    require(!locked_);
-    locked_ = true;
-    _;
-    locked_ = false;
-  }
-}
-pragma solidity^0.4.26;
-
-contract Fund  is sGuard {
-  mapping(address => uint) balances;
-  uint counter = 0;
-  uint dontFixMe = 0;
-
-   function main(uint x) nonReentrant_  public {
-    if (counter < 100) {
-      msg.sender.send(add_uint256(x, 1));
-      counter = add_uint256(counter, 1);
-      dontFixMe ++;
-    }
-  }
-}
+## 2. Usage
+First select the correcponding compiler version. Then run sGuard with the give file:
+```bash
+solc-select use SOLC_VERSION --always-install
+npm run dev FILEPATH [CONTRACT_NAME]
 ```
-## Note: the source code is currently unstable. It will be refactored and updated soon
+CONTRACT_NAME is optional. If CONTRACT_NAME is not provided, sGuard assumes the last contract in the file as the main contract.
+
+### Example
+
+Patch `contracts/sample.sol`:
+```bash
+solc-select use 0.4.26 --always-install
+npm run dev contracts/sample.sol
+```
+The fixed file is `contracts/sample.fixed.sol`

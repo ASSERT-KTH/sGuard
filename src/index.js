@@ -12,18 +12,19 @@ const SRCMap = require('./srcmap')
 let contractFile = 'contracts/sample.sol'
 let fixedFile = 'contracts/fixed.sol'
 let jsonFile = 'contracts/sample.sol.json'
+let mainContract = ''
 
-if (process.send) {
-  const d = JSON.parse(process.argv[2])
-  contractFile = d.contractFile
-  fixedFile = d.fixedFile
-  jsonFile = d.jsonFile
-} else {
-  const { code } = shell.exec(`solc --combined-json bin-runtime,srcmap-runtime,ast,asm ${contractFile} > ${jsonFile}`)
-  if (code != 0) {
-    console.log(`[+] Failed to compile`)
-    return
-  } 
+if (process.argv.length >= 3) {
+  contractFile = process.argv[2]
+  fixedFile = contractFile + '.fixed.sol'
+  jsonFile = contractFile + '.json'
+  if (process.argv[3])
+    mainContract = process.argv[3]
+} 
+const { code } = shell.exec(`solc --combined-json bin-runtime,srcmap-runtime,ast,asm ${contractFile} > ${jsonFile}`)
+if (code != 0) {
+  console.log(`[+] Failed to compile`)
+  return
 }
 /* strip comments */
 source = fs.readFileSync(contractFile, 'utf8')
@@ -34,7 +35,14 @@ assert(jsonOutput.sourceList.length == 1)
 const sourceIndex = jsonOutput.sourceList[0]
 const { AST } = jsonOutput.sources[sourceIndex]
 const { children } = AST
-const { attributes: { name } } = children[children.length - 1]
+// retrieve contract name by selecting the last contract
+let { attributes: { name } } = children[children.length - 1]
+
+// if mainContract is specified and is found in the contract, then use it
+if (process.argv.length >= 3 && mainContract) {
+  const nameFound = children.find(({attributes: { name }}) => name == mainContract)
+  if (nameFound) name = mainContract
+}
 addFunctionSelector(AST)
 
 forEach(jsonOutput.contracts, (contractJson, full) => {
