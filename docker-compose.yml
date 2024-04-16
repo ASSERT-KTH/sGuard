@@ -1,9 +1,0 @@
-version: '3.8'
-
-services:
-  smartbugs:
-    build: .
-    volumes:
-      - /path/to/host/smartbugs:/sGuard/smartbugs
-      - /path/to/host/results:/sGuard/results
-    user: "UID:GID"

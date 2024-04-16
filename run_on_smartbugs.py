@@ -14,7 +14,10 @@ def run_npm_dev(path, contract, outdir, stderr_file, stdout_file):
 
     start_time = time.time()
     with open(stdout_file, 'w') as stdout_f, open(stderr_file, 'w') as stderr_f:
-        result = subprocess.run(command, shell=True, stdout=stdout_f, stderr=stderr_f, timeout=60*5)
+        try:
+            result = subprocess.run(command, shell=True, stdout=stdout_f, stderr=stderr_f, timeout=60*10)
+        except subprocess.TimeoutExpired:
+            return -1, -1
     elapsed_time = time.time() - start_time
     return result.returncode, elapsed_time
 
