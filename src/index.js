@@ -14,12 +14,13 @@ let fixedFile = 'contracts/fixed.sol'
 let jsonFile = 'contracts/sample.sol.json'
 let mainContract = ''
 
-if (process.argv.length >= 3) {
+if (process.argv.length >= 4) {
   contractFile = process.argv[2]
-  fixedFile = contractFile.replace(/\.sol$/, '.fixed.sol')
-  jsonFile = contractFile.replace(/\.sol$/, '.json')
-  if (process.argv[3])
-    mainContract = process.argv[3]
+  fileName = contractFile.split('/').pop();
+  fixedFile = `${process.argv[3]}/${fileName.replace(/\.sol$/, '.fixed.sol')}`
+  jsonFile = `${process.argv[3]}/${fileName.replace(/\.sol$/, '.json')}`
+  if (process.argv[4])
+    mainContract = process.argv[4]
 } 
 const { code } = shell.exec(`solc --combined-json bin-runtime,srcmap-runtime,ast,asm ${contractFile} > ${jsonFile}`)
 if (code != 0) {

@@ -20,4 +20,4 @@ RUN apt-get install -y python3-pip
 RUN pip3 install solc-select
 RUN solc-select use 0.4.26 --always-install
 
-ENTRYPOINT ["npm", "run", "dev"]
+CMD [ "python3", "run_on_smartbugs.py", "smartbugs", "results" ]
