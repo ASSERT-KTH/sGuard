@@ -4,6 +4,6 @@ services:
   smartbugs:
     build: .
     volumes:
-      - /home/mokita/sc_study/dataset/smartbugs-curated:/sGuard/smartbugs
-      - /home/mokita/sc_study/results/sGuard:/sGuard/results
-    user: "1000:1000"
+      - /path/to/host/smartbugs:/sGuard/smartbugs
+      - /path/to/host/results:/sGuard/results
+    user: "UID:GID"
