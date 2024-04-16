@@ -14,8 +14,8 @@ RUN npm -v
 WORKDIR /sGuard
 COPY src src
 COPY contracts contracts
-COPY results results
-COPY smartbugs smartbugs
+RUN mkdir results
+RUN mkdir smartbugs
 COPY package-lock.json package-lock.json
 COPY package.json package.json
 COPY run_on_smartbugs.py run_on_smartbugs.py
