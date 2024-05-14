@@ -6,8 +6,10 @@ import json
 import time
 
 def get_mid_dir(path):
-    path_components = path.split(os.path.sep)
-    return path_components[-2]
+    temp = path.replace(".sol", "")
+    path_components = temp.split(os.path.sep)
+    mid = path_components[-2:]
+    return os.path.join(*mid)
 
 def run_npm_dev(path, contract, outdir, stderr_file, stdout_file):
     command = f"npm run dev {path} {outdir} {contract}"
@@ -25,6 +27,7 @@ def process_entry(path, contract, outdir):
 
     mid = get_mid_dir(path)
     results_dir = outdir
+
     outdir = os.path.join(outdir, mid)
     os.makedirs(outdir, exist_ok=True)
     filename = path.split("/")[-1]
@@ -54,13 +57,13 @@ def main():
     output_dir = sys.argv[2]
 
     # Load JSON file
-    vuln_json = smartbugs_dir + "/vulnerabilities.json"
+    vuln_json = os.path.join(smartbugs_dir, "vulnerabilities.json")
     with open(vuln_json, 'r') as file:
         data = json.load(file)
 
     # Iterate over entries and call npm run dev
     for entry in data:
-        path = smartbugs_dir + "/" + entry.get('path')
+        path = os.path.join(smartbugs_dir, entry.get('path'))
         contract = entry.get('contract_names')[0]
         if path and contract:
             process_entry(path, contract, output_dir)
