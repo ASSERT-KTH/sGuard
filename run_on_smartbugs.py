@@ -23,6 +23,16 @@ def run_npm_dev(path, contract, outdir, stderr_file, stdout_file):
     elapsed_time = time.time() - start_time
     return result.returncode, elapsed_time
 
+def use_solc(version):
+
+    use = f"solc-select use {version} --always-install"
+    try:
+        process = subprocess.run(use, shell=True, check=True)
+
+        return process.returncode == 0
+    except:
+        return False
+
 def process_entry(path, contract, outdir):
 
     mid = get_mid_dir(path)
@@ -55,6 +65,8 @@ def main():
 
     smartbugs_dir = sys.argv[1]
     output_dir = sys.argv[2]
+
+    use_solc("0.4.24")
 
     # Load JSON file
     vuln_json = os.path.join(smartbugs_dir, "vulnerabilities.json")
