@@ -72,8 +72,6 @@ def main():
 
     # Iterate over entries and call npm run dev
     for entry in data:
-        if entry.get('path') != 'dataset/bad_randomness/lucky_doubler.sol':
-            continue
         path = os.path.join(smartbugs_dir, entry.get('path'))
         contract = entry.get('contract_names')[0]
         print(path)
