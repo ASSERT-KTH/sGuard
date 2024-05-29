@@ -14,14 +14,12 @@ def get_mid_dir(path):
 def run_npm_dev(path, contract, outdir, stderr_file, stdout_file):
     command = f"npm run dev {path} {outdir} {contract}"
 
-    start_time = time.time()
     with open(stdout_file, 'w') as stdout_f, open(stderr_file, 'w') as stderr_f:
         try:
             result = subprocess.run(command, shell=True, stdout=stdout_f, stderr=stderr_f, timeout=60*10)
         except subprocess.TimeoutExpired:
-            return -1, -1
-    elapsed_time = time.time() - start_time
-    return result.returncode, elapsed_time
+            return -1
+    return result.returncode
 
 def use_solc(version):
 
@@ -44,16 +42,15 @@ def process_entry(path, contract, outdir):
     stderr_file = os.path.join(outdir, filename.replace(".sol", ".log"))
     stdout_file = os.path.join(outdir, filename.replace(".sol", ".out"))
 
-    return_code, elapsed_time = run_npm_dev(path, contract, outdir, stderr_file, stdout_file)
+    return_code = run_npm_dev(path, contract, outdir, stderr_file, stdout_file)
 
     csv_file = os.path.join(results_dir, 'results.csv')
     with open(csv_file, 'a', newline='') as csvfile:
-        fieldnames = ['path', 'contract', 'elapsed_time', 'return_code']
+        fieldnames = ['path', 'contract', 'return_code']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writerow({
                 'path': path,
                 'contract': contract,
-                'elapsed_time': elapsed_time,
                 'return_code': return_code
             })
 
@@ -75,8 +72,11 @@ def main():
 
     # Iterate over entries and call npm run dev
     for entry in data:
+        if entry.get('path') != 'dataset/bad_randomness/lucky_doubler.sol':
+            continue
         path = os.path.join(smartbugs_dir, entry.get('path'))
         contract = entry.get('contract_names')[0]
+        print(path)
         if path and contract:
             process_entry(path, contract, output_dir)
         else:

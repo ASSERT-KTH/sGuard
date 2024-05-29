@@ -19,6 +19,8 @@ if (process.argv.length >= 4) {
   fileName = contractFile.split('/').pop();
   fixedFile = `${process.argv[3]}/${fileName}`
   jsonFile = `${process.argv[3]}/${fileName.replace(/\.sol$/, '.json')}`
+  bug_report_file = `${process.argv[3]}/${fileName.replace(/\.sol$/, '.bug.json')}`
+  fix_report_file = `${process.argv[3]}/${fileName.replace(/\.sol$/, '.fix.json')}`
   if (process.argv[4])
     mainContract = process.argv[4]
 } 
@@ -27,6 +29,7 @@ if (code != 0) {
   console.log(`[+] Failed to compile`)
   process.exit(code)
 }
+console.log(contractFile)
 /* strip comments */
 source = fs.readFileSync(contractFile, 'utf8')
 const lines = source.split('\n').length
@@ -82,8 +85,11 @@ forEach(jsonOutput.contracts, (contractJson, full) => {
   const integer = !!operators.find(x => ['--', '-=', '-', '+', '++', '+=', '*', '*=', '/', '/=', '**'].includes(x))
   const reentrancy = !!operators.find(x => ['lock:function'].includes(x))
   process.send && process.send({ bug: { integer, reentrancy }})
+  fs.writeFileSync(bug_report_file, JSON.stringify(uncheckOperands), 'utf8')
   /* Patch */
   const bugFixes = scanner.generateBugFixes(uncheckOperands)
+  console.log(bugFixes)
+  fs.writeFileSync(fix_report_file, JSON.stringify(bugFixes), 'utf8')
   process.send && process.send({ duration: { bugAt: Date.now() }})
   const guard = scanner.fix(bugFixes)
   fs.writeFileSync(fixedFile, guard, 'utf8')
